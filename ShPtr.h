@@ -1,47 +1,34 @@
-//
-// Created by Demyan on 12.02.2022.
-//
-#include <string>
-#ifndef L31P1SHARED_PTR_TOY_SHPTR_H
-#define L31P1SHARED_PTR_TOY_SHPTR_H
+#pragma once
+#include <iostream>
+#include <utility>
 
- class Toy{
-   public:
+class Toy{
+public:
     Toy() = delete;
-    Toy(std::string _name):name(_name){};
+    explicit Toy(std::string _name):name(std::move(_name)){};
     std::string name;
 };
 
- class shared_ptr_toy {
-  private:
-    static unsigned int count;
-     Toy *ptr = nullptr;
-  public:
-     shared_ptr_toy(){++count;};
+//---------------------------------
 
-     shared_ptr_toy (Toy* _ptr):shared_ptr_toy() {ptr = _ptr;};
+class shared_ptr_toy {
+private:
+    size_t *count;
+    Toy *ptr;
 
-     shared_ptr_toy(const shared_ptr_toy& other){
-        ptr = new Toy(*other.ptr);
-        ++count;
-    }
+public:
 
-    shared_ptr_toy& operator=(Toy& other){
-        if(this->ptr == &other) return *this;
-        if(this->ptr != nullptr) delete  ptr;
-        ptr = new Toy(other);
-        return *this;
-    }
+    shared_ptr_toy():count(nullptr),ptr(nullptr){};
+    shared_ptr_toy (Toy* toy);
+    shared_ptr_toy(shared_ptr_toy& other);
 
-     unsigned  int Count(){return count;}
+    size_t use_count();
+    bool unique();
+    Toy* get(){return ptr;}
+    shared_ptr_toy& operator=(const shared_ptr_toy& other);
 
-     Toy* GetPtr(){return ptr;}
+    void Show();
+    void reset();
 
-    ~shared_ptr_toy(){
-        --count;
-        delete ptr;
-    }
+    ~shared_ptr_toy();
 };
-
-
-#endif //L31P1SHARED_PTR_TOY_SHPTR_H
